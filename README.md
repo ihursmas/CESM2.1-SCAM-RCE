@@ -3,10 +3,12 @@
 ## Background
 The Single Column Atmosphere Model (SCAM) is a single column model version of the Community Atmosphere Model (CAM). The overview and application of SCAM can be found in [Gettelman et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2018MS001578).
 
-## How to run SCAM RCE in CESM2.1?
+<br/>
+
+## Running SCAM RCE in CESM2.1
 1. Get the code of [CESM2.1](https://escomp.github.io/CESM/versions/cesm2.1/html/downloading_cesm.html) and put it wherever you like (hereafter [CESMDIR]), and check [how to run SCAM](https://www.cesm.ucar.edu/models/simpler-models/scam/index.html) in CESM2.
 2. Put **InputFiles** wherever you like (hereafter [INPUTDIR])
-3. Copy both **scam5\_rcemip** (in **SCAM5** directory) and **scam6\_rcemip** (in **SCAM6** directory), which are the user-modified source code for SCAM5 and SCAM6, respectively, to [CESMDIR]/components/cam/cime_config/usermods_dirs/.
+3. Copy both **scam5\_rcemip** (in **SCAM5** directory) and **scam6\_rcemip** (in **SCAM6** directory), which are the RCE modified source code for SCAM5 and SCAM6, respectively, to [CESMDIR]/components/cam/cime_config/usermods_dirs/.
 4. In **SCAM5** or **SCAM6** directory, edit the shell script **scam\*\_rcemip\_single** (for a single run) or **scam\*\_rcemip\_loop** (for simultaneously multiple runs or parameter sweep experiments). Particular focuses include:
    * the job setting information such as project account, timewall, and queue;
    * the machine and compiler;
@@ -18,7 +20,7 @@ The Single Column Atmosphere Model (SCAM) is a single column model version of th
 
 The **InputFiles** directory includes all the required input data files and can be categorized into several different groups:
 * **SST\*.nc**: uniformly global SST data, currently with three SST values – 295, 300, and 305 K – as required in RCEMIP.
-* **\*init\*.nc**: initial condition files which have uniformly global data of state; can choose either RCEMIP analytical profiles or RCEALT (ALTernative) profiles  
+* **\*init\*.nc**: initial condition files which have uniformly global data of state; can choose either RCEMIP analytical profiles or RCEALT (ALTernative) profiles.
 * **\*iop\*.nc**: IOP data files which carry the same data of state as in the corresponding **\*init\*.nc** files; the current available running period is 1200 days (can easily be extended).
 * **\*solar\*.nc**: these files are basically used to fix the solar constant to 551.58 W/m2; the one with "CAM6" is for SCAM6.
 * **RCEMIPozone\*.nc**: the analytical ozone profile following RCEMIP protocols; the "L26" and "L32" are for SCAM5 and SCAM6, repsectively.
@@ -26,7 +28,8 @@ The **InputFiles** directory includes all the required input data files and can 
 
 Additionally, there is this **NCLscripts** directory, which includes all the NCL scripts for generating **\*init\*.nc**, **\*iop\*.nc**, and **RCEMIPozone\*.nc**.
 
+<br/>
+
 ## Details of the SCAM-RCE configuration
-The current SCAM-RCE configuration in CESM2.1.0 is based on the RCEMIP protocols in [Wing et al. (2018)](https://gmd.copernicus.org/articles/11/793/2018/), along with additional modifications as options. The RCEMIP protocols and their corresponding parts in CESM2.1.0 are described as follows.
-### aaa
+The current SCAM-RCE configuration in CESM2.1.0 is based on the RCEMIP protocols in [Wing et al. (2018)](https://gmd.copernicus.org/articles/11/793/2018/), along with additional modifications as options. The RCEMIP protocols and their corresponding parts of modified code in CESM2.1.0 are descibed in **RCEMIP_SCAM5&6_CESM2.pdf**.
  
