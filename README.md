@@ -7,7 +7,7 @@ The Single Column Atmosphere Model (SCAM) is a single column model version of th
 
 ## Running SCAM RCE in CESM2.1
 1. Get the code of [CESM2.1](https://escomp.github.io/CESM/versions/cesm2.1/html/downloading_cesm.html) and put it wherever you like (hereafter [CESMDIR]), and check [how to run SCAM](https://www.cesm.ucar.edu/models/simpler-models/scam/index.html) in CESM2.
-2. Download [**InputFiles**](https://drive.google.com/drive/folders/1R5Ft5n3R49048YFHD8RwYDntCwYMD-X3?usp=sharing) and put it wherever you like (hereafter [INPUTDIR])
+2. Download [**InputFiles**](https://drive.google.com/drive/folders/1bqDhl-QVqwJ8yAXcvm1pQ6LY22HumSti?usp=sharing) and put it wherever you like (hereafter [INPUTDIR])
 3. Copy both **scam5\_rcemip** (in **SCAM5** directory) and **scam6\_rcemip** (in **SCAM6** directory), which are the RCE modified source code for SCAM5 and SCAM6, respectively, to [CESMDIR]/components/cam/cime_config/usermods_dirs/.
 4. In **SCAM5** or **SCAM6** directory, edit the shell script **scam\*\_rcemip\_single** (for a single run) or **scam\*\_rcemip\_loop** (for simultaneously multiple runs or parameter sweep experiments). Particular focuses include:
    * the job setting information such as project account, timewall, and queue;
