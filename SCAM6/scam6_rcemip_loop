@@ -1,0 +1,192 @@
+#!/bin/csh -fv
+
+### ============
+### Job settings
+### ============
+
+### project numbers available
+setenv PROJECT       XXXX
+setenv timewall      0:30
+setenv queue         regular
+setenv PBS_ACCOUNT   XXXX
+
+### Run with ./create_scam6_iop <IOP> where IOP names are listed below
+### Alternatively with the 'parallel' script: 
+### parallel -j12 ./create_scam6_iop {} ::: arm95 arm97 atex bomex cgilsS11 cgilsS12 cgilsS6 dycomsRF01 dycomsRF02 gateIII mpace rico sparticus togaII twp06
+
+### (-j12 builds & runs 12 create_scam6 cases in parallel and each case should call make with 4 processors so that uses all 48 processors on a node.) 
+
+
+
+setenv this_dir  `pwd`
+
+### ==========================================
+### Location of cesm code and case directories
+### ==========================================
+
+### Model
+set MODEL = SCAM6
+set CESMDIR = XXXX 
+set INPUTDIR = XXXX
+set CASEDIR = XXXX
+
+### Standard Run Settings
+set RES  = T42_T42
+set COMPSET = FSCAM
+set COMPILER = intel
+
+### Machine
+set MACH = cheyenne
+ 
+### Name of the 'IOP'
+set IOP = rcemip
+
+### Location of IOP data in CESM Tag
+set MODSDIR = $CESMDIR/components/cam/cime_config/usermods_dirs
+
+
+
+### ======================================
+### Create, setup, and build the base case
+### ======================================
+
+### Number of model vertical levels [30, 32, 60]: the CAM5 default is 30; the CAM6 default is 32
+foreach NL (32 60)
+#set NL  = 60
+
+### Base Case Name
+set BASECASENAME = base.${MODEL}.${IOP}.L${NL}
+cd  $CASEDIR
+
+### Create a new base case
+$CESMDIR/cime/scripts/create_newcase --compset $COMPSET --res $RES --compiler $COMPILER --case $CASEDIR/$BASECASENAME --user-mods-dir ${MODSDIR}/scam6_${IOP} --run-unsupported --machine $MACH
+
+cd  $CASEDIR/$BASECASENAME
+
+### Build/Run directory of the base case (here under case directory)
+set BLDDIR = ${CASEDIR}/${BASECASENAME}/bld
+set RUNDIR = ${CASEDIR}/${BASECASENAME}/run
+
+### Set build and run directories to be under case directory.
+./xmlchange EXEROOT=$BLDDIR
+./xmlchange RUNDIR=$RUNDIR
+
+### CAM CONFIGURATION OPTIONS HERE
+##./xmlchange CAM_CONFIG_OPTS="-phys cam6 -microphys mg2"
+
+### Set levels (NL)
+./xmlchange --append CAM_CONFIG_OPTS="-nlev ${NL}"
+
+cat >> user_nl_cam << EOF
+ncdata  = '${INPUTDIR}/RCEMIPinit_sst300_rh70_u5_lv${NL}.nc'
+EOF
+
+### Setup Case
+./*.setup #-d -v  #-d -v for verbose and debug file
+
+### Copy source mods into case directory
+/bin/cp  ${MODSDIR}/scam6_${IOP}/*.F90 SourceMods/src.cam/
+/bin/mv  SourceMods/src.cam/seq_flux_mct.F90 SourceMods/src.drv/seq_flux_mct.F90
+
+### Build
+qcmd -- ./*.build #-d -v   #-d -v for verbose and debug file
+
+
+
+### ===========================================================================================
+### Loop: number of vertical levels (NL), time step (DT), RCEMIP's selection of SST (SST), ect.
+### ===========================================================================================
+
+cd  $CASEDIR
+
+### Timestep [60, 300, 600, 900, 1200, 1800]: the default is 1800 s
+#foreach DT (60 300 1800)
+set DT  = 1800
+
+### SST of the initial conditions for RCEMIP_small runs: [295, 300, 305]
+#foreach SST (295 300 305)
+set SST = 305
+
+### Running period (unit: day)
+set LT  = 100
+
+### Case Name
+set CASENAME = ${MODEL}.${IOP}_sst${SST}.L${NL}.${DT}s.${LT}d
+
+### Create cases
+$CESMDIR/cime/scripts/create_clone --clone $CASEDIR/$BASECASENAME --case $CASEDIR/$CASENAME --user-mods-dir ${MODSDIR}/scam6_${IOP} --keepexe
+
+cd $CASEDIR/$CASENAME
+
+### Run directory of each case (here under case directory)
+set RUNDIR = ${CASEDIR}/${CASENAME}/run
+./xmlchange RUNDIR=$RUNDIR
+./xmlchange DOUT_S="FALSE"
+
+
+### ------------------------
+### Additional modifications
+### ------------------------
+
+### DEBUG
+#./xmlchange DEBUG='TRUE'
+
+### Set timestep (DT):
+### For CESM timestep is atm_cpl_dt. Set as atm_cpl_dt = NCPL_BASE_PERIOD / ATM_NCPL
+### Default NCPL_BASE_PERIOD = 1 day = 86400 sec., default ATM_NCPL = 48 => default atm_cpl_dt = 1800 sec.
+@ atmncpl = 86400 / $DT
+./xmlchange ATM_NCPL=$atmncpl
+
+### Set running period
+@ nstep = $LT * 86400 / $DT
+./xmlchange STOP_OPTION=nsteps
+./xmlchange STOP_N=$nstep
+
+### Set sea surface temperature (SST) and sea ice data file
+./xmlchange SSTICE_DATA_FILENAME="${INPUTDIR}/SST${SST}K_ICEnone_180x360.nc"
+
+### Change CPL_ALBAV to set "flux_albav = .true." in drv_in (for the fixed surface albedo)
+./xmlchange CPL_ALBAV="TRUE"
+
+### Add all user specific cam namelist changes here
+### Output can also be specified here (e.g. fincl1)
+cat >> user_nl_cam << EOF
+ncdata  = '${INPUTDIR}/RCEMIPinit_sst${SST}_lv${NL}.nc'
+iopfile = '${INPUTDIR}/RCEMIPiop_sst${SST}_lv${NL}_1200d.nc'
+history_chemistry       = .false.
+history_chemspecies_srf = .false.
+EOF
+### Alternative ICs 
+#cat >> user_nl_cam << EOF
+#ncdata  = '${INPUTDIR}/RCEALTinit_sst${SST}_rh70_u5_lv${NL}.nc'
+#iopfile = '${INPUTDIR}/RCEALTiop_sst${SST}_rh70_u5_lv${NL}_1200d.nc'
+#EOF
+
+### !!! THIS MIGHT BE DANGEROUS !!!
+### If using time steps interval less than or equal to 300 second (say 60 second):
+if ( ${DT} < 300 ) then
+cat >> user_nl_cam << EOF
+clubb_timestep       = ${DT}.0D0
+cld_macmic_num_steps = 1
+EOF
+endif
+
+
+
+### ---------------
+### Submit the case
+### ---------------
+
+### Make timing dir kludge
+mkdir -p $RUNDIR/timing/checkpoints
+
+### Submit to Queue
+./*.submit
+
+
+
+#end #foreach SST
+
+#end #foreach DT
+
+end #foreach NL

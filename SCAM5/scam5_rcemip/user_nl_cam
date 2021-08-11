@@ -1,0 +1,42 @@
+scmlon          = 180.
+scmlat          = 0.
+
+use_topo_file          = .false.
+use_gw_front           = .false.
+
+solar_irrad_data_file = '/glade/u/home/ihu/SCAM_RCE/InputFiles/ape_solar_ave_tsi_551.58.nc'
+
+prescribed_aero_datapath       = '/glade/u/home/ihu/SCAM_RCE/InputFiles'
+prescribed_aero_file           = 'aero_zero.nc'
+prescribed_aero_cycle_yr       = 2000
+prescribed_aero_type           = 'CYCLICAL'
+prescribed_aero_model          = 'bulk'
+
+prescribed_ozone_cycle_yr      = 2000
+prescribed_ozone_datapath      = '/glade/u/home/ihu/SCAM_RCE/InputFiles'
+prescribed_ozone_file          = 'RCEMIPozone_L26.nc'
+prescribed_ozone_name          = 'O3'
+prescribed_ozone_type          = 'CYCLICAL'
+
+prescribed_strataero_feedback  = .false.
+
+ch4vmr  = 1.650e-6
+co2vmr  = 348.0e-6
+n2ovmr  = 0.306e-6
+f11vmr  = 0.0
+f12vmr  = 0.0
+
+ext_frc_specifier     = ""
+srf_emis_specifier    = ""
+tracer_cnst_specifier = ""
+
+micro_mg_nccons = .true.
+micro_mg_nicons = .true.
+
+cpwv           = 1.846e3
+gravit         = 9.79764
+mwdry          = 28.96623324623746
+mwh2o          = 18.01618112892741
+rearth         = 6.37100e6
+sday           = 86164.10063718943
+
