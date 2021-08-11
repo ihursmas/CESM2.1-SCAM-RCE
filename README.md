@@ -1,4 +1,4 @@
-# CESM2.1.0-SCAM-RCE
+# CESM2.1-SCAM-RCE
 
 ## Background
 The Single Column Atmosphere Model (SCAM) is a single column model version of the Community Atmosphere Model (CAM). The overview and application of SCAM can be found in [Gettelman et al. (2019)](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2018MS001578).
