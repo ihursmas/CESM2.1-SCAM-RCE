@@ -31,5 +31,5 @@ Additionally, there is this **NCLscripts** directory, which includes all the NCL
 <br/>
 
 ## Details of the SCAM-RCE configuration
-The current SCAM-RCE configuration in CESM2.1.0 is based on the RCEMIP protocols in [Wing et al. (2018)](https://gmd.copernicus.org/articles/11/793/2018/), along with additional modifications as options. The RCEMIP protocols and their corresponding parts of modified code in CESM2.1.0 are descibed in **RCEMIP_SCAM5&6_CESM2.pdf**.
+The current SCAM-RCE configuration in CESM2.1.0 is based on the RCEMIP protocols in [Wing et al. (2018)](https://gmd.copernicus.org/articles/11/793/2018/), along with additional modifications as options. The RCEMIP protocols and their corresponding parts of modified code in CESM2.1.0 are descibed in [**RCEMIP_SCAM5&6_CESM2.pdf**](https://github.com/ihursmas/CESM2.1-SCAM-RCE/blob/main/RCEMIP_SCAM5%266_CESM2.pdf).
  
